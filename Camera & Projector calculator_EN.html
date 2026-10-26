@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera & Projector Installation Calculator</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-color: #2563eb;
+            --proj-color: #7c3aed;
+            --text-color: #0f172a;
+            --border-color: #cbd5e1;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 740px;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-color);
+        }
+        
+        /* Main page classification tabs */
+        .main-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 8px;
+        }
+        .main-nav-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #64748b;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .main-nav-btn.active.cam-mode {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+        .main-nav-btn.active.proj-mode {
+            background: var(--proj-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .sub-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .sub-tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sub-tab-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        .proj-active .sub-tab-btn.active {
+            color: var(--proj-color);
+            border-bottom: 3px solid var(--proj-color);
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+        .sensor-input-type {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .sensor-input-type label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .form-group { margin-bottom: 12px; }
+        label.input-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+        .input-row { display: flex; gap: 6px; }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 9px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+        }
+        .unit {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        /* Slider area */
+        .zoom-slider-container {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            border: 1px solid #e2e8f0;
+        }
+        .zoom-slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+        .zoom-slider-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .zoom-slider-bar input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+        .proj-active .zoom-slider-bar input[type="range"] {
+            accent-color: var(--proj-color);
+        }
+        .zoom-val-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        .proj-active .zoom-val-badge { background: var(--proj-color); }
+
+        /* Result card layout */
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .result-card {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .result-card.wide { border-color: #93c5fd; background-color: #eff6ff; }
+        .result-card.current { border-color: #0284c7; background-color: #f0f9ff; box-shadow: 0 0 8px rgba(2, 132, 199, 0.15); }
+        .result-card.tele { border-color: #99f6e4; background-color: #f0fdfa; }
+        
+        .proj-active .result-card.wide { border-color: #ddd6fe; background-color: #f5f3ff; }
+        .proj-active .result-card.current { border-color: #7c3aed; background-color: #faf5ff; box-shadow: 0 0 8px rgba(124, 58, 237, 0.15); }
+        .proj-active .result-card.tele { border-color: #c084fc; background-color: #fdf4ff; }
+
+        .result-card h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .result-card.wide h4 { color: #1e40af; }
+        .result-card.current h4 { color: #0369a1; }
+        .result-card.tele h4 { color: #0f766e; }
+        
+        .proj-active .result-card.wide h4 { color: #5b21b6; }
+        .proj-active .result-card.current h4 { color: #6d28d9; }
+        .proj-active .result-card.tele h4 { color: #7e22ce; }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 6px;
+        }
+        .result-item span { color: #64748b; }
+        .result-item strong { color: #0f172a; }
+
+        .page-content { display: none; }
+        .page-content.active { display: block; }
+        .sub-tab-content { display: none; }
+        .sub-tab-content.active { display: block; }
+        .calc-info { font-size: 0.78rem; color: #2563eb; margin-top: 4px; }
+        hr { border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainContainer">
+    <h1>Camera & Projector Installation Calculator</h1>
+
+    <!-- Top navigation tabs for main page distinction -->
+    <div class="main-nav">
+        <button class="main-nav-btn active cam-mode" onclick="switchMainPage('camera')">📷 Camera FOV/Distance</button>
+        <button class="main-nav-btn proj-mode" onclick="switchMainPage('projector')">📹 Projector Throw Distance</button>
+    </div>
+
+    <!-- ==========================================
+         PAGE 1: Camera Calculator
+    ========================================== -->
+    <div id="pageCamera" class="page-content active">
+        <div class="section-title">📷 Camera & Lens Specifications</div>
+        
+        <div class="sensor-input-type">
+            <label><input type="radio" name="sensorMode" value="preset" checked onchange="toggleSensorMode()"> Select Sensor Preset</label>
+            <label><input type="radio" name="sensorMode" value="mm" onchange="toggleSensorMode()"> Custom Input (mm)</label>
+        </div>
+
+        <div id="modePreset">
+            <div class="form-group">
+                <label class="input-label">Sensor Size List</label>
+                <select id="sensorPreset" onchange="applySensorPreset(); updateCamAll();">
+                    <option value="ff" selected>Full Frame 35mm (36.0 x 24.0 mm)</option>
+                    <option value="aps-c">APS-C (Super 35mm) (23.6 x 15.6 mm)</option>
+                    <option value="1.0inch">1.0 inch (12.8 x 9.6 mm)</option>
+                    <option value="1/1.2">1/1.2 inch (10.67 x 8.0 mm)</option>
+                    <option value="2/3">2/3 inch (8.8 x 6.6 mm)</option>
+                    <option value="1/1.8">1/1.8 inch (7.18 x 5.32 mm)</option>
+                    <option value="1/2">1/2 inch (6.4 x 4.8 mm)</option>
+                    <option value="1/2.3">1/2.3 inch (6.17 x 4.55 mm)</option>
+                    <option value="1/2.5">1/2.5 inch (5.76 x 4.29 mm)</option>
+                    <option value="1/2.8">1/2.8 inch (5.35 x 4.01 mm)</option>
+                    <option value="custom">Custom Input</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="modeMM" style="margin-top: 8px;">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="input-label">Sensor Width (W)</label>
+                    <div class="input-row">
+                        <input type="number" id="sensorW" value="36.0" step="any" oninput="updateCamAll()">
+                        <div class="unit">mm</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="input-label">Sensor Height (H)</label>
+                    <div class="input-row">
+                        <input type="number" id="sensorH" value="24.0" step="any" oninput="updateCamAll()">
+                        <div class="unit">mm</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-grid" style="margin-top: 12px;">
+            <div class="form-group">
+                <label class="input-label">Wide Focal Length (Max FOV)</label>
+                <div class="input-row">
+                    <input type="number" id="focalWide" value="24" step="any" oninput="syncCamSliderLimits(); updateCamAll();">
+                    <div class="unit">mm</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Tele Focal Length (Max Telephoto)</label>
+                <div class="input-row">
+                    <input type="number" id="focalTele" value="70" step="any" oninput="syncCamSliderLimits(); updateCamAll();">
+                    <div class="unit">mm</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="zoom-slider-container">
+            <div class="zoom-slider-header">
+                <span>Wide <span id="camLblWide">24</span>mm</span>
+                <span>Current Focal Length: <strong class="zoom-val-badge" id="camLblCurrent">50.0 mm</strong></span>
+                <span>Tele <span id="camLblTele">70</span>mm</span>
+            </div>
+            <div class="zoom-slider-bar">
+                <input type="range" id="camZoomSlider" min="24" max="70" value="50" step="0.1" oninput="updateCamAll()">
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="sub-tabs">
+            <button class="sub-tab-btn active" onclick="switchCamSubTab('camTab1')">1. Distance → Screen Size</button>
+            <button class="sub-tab-btn" onclick="switchCamSubTab('camTab2')">2. Screen Size → Distance</button>
+        </div>
+
+        <div id="camTab1" class="sub-tab-content active">
+            <div class="form-group">
+                <label class="input-label">Camera - Subject Distance</label>
+                <div class="input-row">
+                    <input type="number" id="camInputDistance" value="10" step="any" oninput="updateCamAll()">
+                    <div class="unit">m</div>
+                </div>
+            </div>
+            <div class="results-container">
+                <div class="result-card wide">
+                    <h4><span>Wide</span><small id="wFovDeg">-</small></h4>
+                    <div class="result-item"><span>Width:</span> <strong id="wWidth">-</strong></div>
+                    <div class="result-item"><span>Height:</span> <strong id="wHeight">-</strong></div>
+                </div>
+                <div class="result-card current">
+                    <h4><span>Current Zoom</span><small id="curFovDeg">-</small></h4>
+                    <div class="result-item"><span>Width:</span> <strong id="curWidth">-</strong></div>
+                    <div class="result-item"><span>Height:</span> <strong id="curHeight">-</strong></div>
+                </div>
+                <div class="result-card tele">
+                    <h4><span>Tele</span><small id="tFovDeg">-</small></h4>
+                    <div class="result-item"><span>Width:</span> <strong id="tWidth">-</strong></div>
+                    <div class="result-item"><span>Height:</span> <strong id="tHeight">-</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="camTab2" class="sub-tab-content">
+            <div class="form-group">
+                <label class="input-label">Required Screen Width</label>
+                <div class="input-row">
+                    <input type="number" id="camInputWidth" value="5" step="any" oninput="updateCamAll()">
+                    <div class="unit">m</div>
+                </div>
+            </div>
+            <div class="results-container">
+                <div class="result-card wide">
+                    <h4><span>Wide Standard</span></h4>
+                    <div class="result-item"><span>Distance:</span> <strong id="wDist">-</strong></div>
+                </div>
+                <div class="result-card current">
+                    <h4><span>Current Zoom Standard</span></h4>
+                    <div class="result-item"><span>Distance:</span> <strong id="curDist">-</strong></div>
+                </div>
+                <div class="result-card tele">
+                    <h4><span>Tele Standard</span></h4>
+                    <div class="result-item"><span>Distance:</span> <strong id="tDist">-</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PAGE 2: Projector Calculator
+    ========================================== -->
+    <div id="pageProjector" class="page-content">
+        <div class="section-title">📹 Projector & Lens Specifications</div>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="input-label">Aspect Ratio</label>
+                <select id="projAspect" onchange="updateProjAll()">
+                    <option value="16:9" selected>16:9 (HD / Full HD / 4K)</option>
+                    <option value="16:10">16:10 (WUXGA / WXGA)</option>
+                    <option value="4:3">4:3 (XGA)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Lens Type / Zoom Type</label>
+                <select id="projLensPreset" onchange="applyProjPreset(); updateProjAll();">
+                    <option value="custom">Custom Input</option>
+                    <option value="standard" selected>Standard Lens (1.2 ~ 1.8)</option>
+                    <option value="short">Short Throw Lens (0.6 ~ 0.8)</option>
+                    <option value="ultrashort">Ultra Short Throw (0.25 ~ 0.35)</option>
+                    <option value="long">Long Throw Lens (2.0 ~ 3.5)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="input-label">Throw Ratio Wide</label>
+                <div class="input-row">
+                    <input type="number" id="projThrowWide" value="1.2" step="0.01" oninput="syncProjSliderLimits(); updateProjAll();">
+                    <div class="unit">: 1</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Throw Ratio Tele</label>
+                <div class="input-row">
+                    <input type="number" id="projThrowTele" value="1.8" step="0.01" oninput="syncProjSliderLimits(); updateProjAll();">
+                    <div class="unit">: 1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="zoom-slider-container">
+            <div class="zoom-slider-header">
+                <span>Wide <span id="projLblWide">1.20</span>:1</span>
+                <span>Current Throw Ratio: <strong class="zoom-val-badge" id="projLblCurrent">1.50 : 1</strong></span>
+                <span>Tele <span id="projLblTele">1.80</span>:1</span>
+            </div>
+            <div class="zoom-slider-bar">
+                <input type="range" id="projSlider" min="1.2" max="1.8" value="1.5" step="0.01" oninput="updateProjAll()">
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="sub-tabs">
+            <button class="sub-tab-btn active" onclick="switchProjSubTab('projTab1')">1. Throw Distance → Screen Size</button>
+            <button class="sub-tab-btn" onclick="switchProjSubTab('projTab2')">2. Screen Size → Throw Distance</button>
+        </div>
+
+        <div id="projTab1" class="sub-tab-content active">
+            <div class="form-group">
+                <label class="input-label">Throw Distance (Projector ↔ Screen)</label>
+                <div class="input-row">
+                    <input type="number" id="projInputDistance" value="4.0" step="any" oninput="updateProjAll()">
+                    <div class="unit">m</div>
+                </div>
+            </div>
+
+            <div class="results-container">
+                <div class="result-card wide">
+                    <h4><span>Max Screen (Wide)</span></h4>
+                    <div class="result-item"><span>Size:</span> <strong id="p1WDiag">-</strong></div>
+                    <div class="result-item"><span>Width:</span> <strong id="p1WWidth">-</strong></div>
+                    <div class="result-item"><span>Height:</span> <strong id="p1WHeight">-</strong></div>
+                </div>
+                <div class="result-card current">
+                    <h4><span>Current Zoom Screen</span></h4>
+                    <div class="result-item"><span>Size:</span> <strong id="p1CurDiag">-</strong></div>
+                    <div class="result-item"><span>Width:</span> <strong id="p1CurWidth">-</strong></div>
+                    <div class="result-item"><span>Height:</span> <strong id="p1CurHeight">-</strong></div>
+                </div>
+                <div class="result-card tele">
+                    <h4><span>Min Screen (Tele)</span></h4>
+                    <div class="result-item"><span>Size:</span> <strong id="p1TDiag">-</strong></div>
+                    <div class="result-item"><span>Width:</span> <strong id="p1TWidth">-</strong></div>
+                    <div class="result-item"><span>Height:</span> <strong id="p1THeight">-</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="projTab2" class="sub-tab-content">
+            <div class="form-group">
+                <label class="input-label">Target Screen Diagonal Size</label>
+                <div class="input-row">
+                    <input type="number" id="projInputInch" value="120" step="any" oninput="updateProjAll()">
+                    <div class="unit">inch</div>
+                </div>
+            </div>
+
+            <div class="results-container">
+                <div class="result-card wide">
+                    <h4><span>Wide (Shortest Distance)</span></h4>
+                    <div class="result-item"><span>Required Distance:</span> <strong id="p2WDist">-</strong></div>
+                </div>
+                <div class="result-card current">
+                    <h4><span>Current Zoom Position</span></h4>
+                    <div class="result-item"><span>Required Distance:</span> <strong id="p2CurDist">-</strong></div>
+                </div>
+                <div class="result-card tele">
+                    <h4><span>Tele (Longest Distance)</span></h4>
+                    <div class="result-item"><span>Required Distance:</span> <strong id="p2TDist">-</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeMainPage = 'camera';
+    let activeCamTab = 'camTab1';
+    let activeProjTab = 'projTab1';
+
+    function switchMainPage(page) {
+        activeMainPage = page;
+        const container = document.getElementById('mainContainer');
+        const camBtn = document.querySelectorAll('.main-nav-btn')[0];
+        const projBtn = document.querySelectorAll('.main-nav-btn')[1];
+
+        if (page === 'camera') {
+            container.classList.remove('proj-active');
+            camBtn.classList.add('active');
+            projBtn.classList.remove('active');
+            document.getElementById('pageCamera').classList.add('active');
+            document.getElementById('pageProjector').classList.remove('active');
+            updateCamAll();
+        } else {
+            container.classList.add('proj-active');
+            camBtn.classList.remove('active');
+            projBtn.classList.add('active');
+            document.getElementById('pageCamera').classList.remove('active');
+            document.getElementById('pageProjector').classList.add('active');
+            updateProjAll();
+        }
+    }
+
+    /* ==========================================
+       1. Camera Calculator Logic
+    ========================================== */
+    function switchCamSubTab(tabId) {
+        activeCamTab = tabId;
+        const btns = document.querySelectorAll('#pageCamera .sub-tab-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#pageCamera .sub-tab-content').forEach(c => c.classList.remove('active'));
+
+        if(tabId === 'camTab1') {
+            btns[0].classList.add('active');
+            document.getElementById('camTab1').classList.add('active');
+        } else {
+            btns[1].classList.add('active');
+            document.getElementById('camTab2').classList.add('active');
+        }
+        updateCamAll();
+    }
+
+    function toggleSensorMode() {
+        const mode = document.querySelector('input[name="sensorMode"]:checked').value;
+        const presetBox = document.getElementById('modePreset');
+        const presetSelect = document.getElementById('sensorPreset');
+        
+        if (mode === 'preset') {
+            presetBox.style.display = 'block';
+            // Return to default (Full Frame) when returning to preset mode from custom input
+            if (presetSelect.value === 'custom') {
+                presetSelect.value = 'ff';
+            }
+            applySensorPreset();
+        } else {
+            presetBox.style.display = 'none';
+            presetSelect.value = 'custom';
+        }
+        updateCamAll();
+    }
+
+    function applySensorPreset() {
+        const presetSelect = document.getElementById('sensorPreset');
+        const preset = presetSelect.value;
+        const sw = document.getElementById('sensorW');
+        const sh = document.getElementById('sensorH');
+
+        if (preset === 'custom') {
+            document.querySelectorAll('input[name="sensorMode"]')[1].checked = true;
+            document.getElementById('modePreset').style.display = 'none';
+            sw.focus();
+            return;
+        }
+
+        switch(preset) {
+            case 'ff': sw.value = 36.0; sh.value = 24.0; break;
+            case 'aps-c': sw.value = 23.6; sh.value = 15.6; break;
+            case '1.0inch': sw.value = 12.8; sh.value = 9.6; break;
+            case '1/1.2': sw.value = 10.67; sh.value = 8.0; break;
+            case '2/3': sw.value = 8.8; sh.value = 6.6; break;
+            case '1/1.8': sw.value = 7.18; sh.value = 5.32; break;
+            case '1/2': sw.value = 6.4; sh.value = 4.8; break;
+            case '1/2.3': sw.value = 6.17; sh.value = 4.55; break;
+            case '1/2.5': sw.value = 5.76; sh.value = 4.29; break;
+            case '1/2.8': sw.value = 5.35; sh.value = 4.01; break;
+        }
+    }
+
+    function syncCamSliderLimits() {
+        const fWide = parseFloat(document.getElementById('focalWide').value) || 1;
+        const fTele = parseFloat(document.getElementById('focalTele').value) || 10;
+        const slider = document.getElementById('camZoomSlider');
+
+        slider.min = fWide;
+        slider.max = fTele;
+        
+        if(parseFloat(slider.value) < fWide) slider.value = fWide;
+        if(parseFloat(slider.value) > fTele) slider.value = fTele;
+
+        document.getElementById('camLblWide').innerText = fWide;
+        document.getElementById('camLblTele').innerText = fTele;
+    }
+
+    function calcFOV(sensorDim, focalLength) {
+        return 2 * Math.atan(sensorDim / (2 * focalLength));
+    }
+
+    function updateCamAll() {
+        const sw = parseFloat(document.getElementById('sensorW').value);
+        const sh = parseFloat(document.getElementById('sensorH').value);
+        const fWide = parseFloat(document.getElementById('focalWide').value);
+        const fTele = parseFloat(document.getElementById('focalTele').value);
+        const curFocal = parseFloat(document.getElementById('camZoomSlider').value);
+
+        document.getElementById('camLblCurrent').innerText = curFocal.toFixed(1) + ' mm';
+
+        if (!sw || !sh || !fWide || !fTele || fWide >= fTele) return;
+
+        const fovH_Wide = calcFOV(sw, fWide);
+        const fovV_Wide = calcFOV(sh, fWide);
+        const fovH_Cur  = calcFOV(sw, curFocal);
+        const fovV_Cur  = calcFOV(sh, curFocal);
+        const fovH_Tele = calcFOV(sw, fTele);
+        const fovV_Tele = calcFOV(sh, fTele);
+
+        if (activeCamTab === 'camTab1') {
+            const dist = parseFloat(document.getElementById('camInputDistance').value);
+            if (!dist || dist <= 0) return;
+
+            document.getElementById('wFovDeg').innerText = (fovH_Wide * 180 / Math.PI).toFixed(1) + '°';
+            document.getElementById('curFovDeg').innerText = (fovH_Cur * 180 / Math.PI).toFixed(1) + '°';
+            document.getElementById('tFovDeg').innerText = (fovH_Tele * 180 / Math.PI).toFixed(1) + '°';
+
+            document.getElementById('wWidth').innerText = (2 * dist * Math.tan(fovH_Wide / 2)).toFixed(2) + ' m';
+            document.getElementById('wHeight').innerText = (2 * dist * Math.tan(fovV_Wide / 2)).toFixed(2) + ' m';
+
+            document.getElementById('curWidth').innerText = (2 * dist * Math.tan(fovH_Cur / 2)).toFixed(2) + ' m';
+            document.getElementById('curHeight').innerText = (2 * dist * Math.tan(fovV_Cur / 2)).toFixed(2) + ' m';
+
+            document.getElementById('tWidth').innerText = (2 * dist * Math.tan(fovH_Tele / 2)).toFixed(2) + ' m';
+            document.getElementById('tHeight').innerText = (2 * dist * Math.tan(fovV_Tele / 2)).toFixed(2) + ' m';
+        } else {
+            const targetW = parseFloat(document.getElementById('camInputWidth').value);
+            if (!targetW || targetW <= 0) return;
+
+            document.getElementById('wDist').innerText = (targetW / (2 * Math.tan(fovH_Wide / 2))).toFixed(2) + ' m';
+            document.getElementById('curDist').innerText = (targetW / (2 * Math.tan(fovH_Cur / 2))).toFixed(2) + ' m';
+            document.getElementById('tDist').innerText = (targetW / (2 * Math.tan(fovH_Tele / 2))).toFixed(2) + ' m';
+        }
+    }
+
+    /* ==========================================
+       2. Projector Calculator Logic
+    ========================================== */
+    function switchProjSubTab(tabId) {
+        activeProjTab = tabId;
+        const btns = document.querySelectorAll('#pageProjector .sub-tab-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#pageProjector .sub-tab-content').forEach(c => c.classList.remove('active'));
+
+        if(tabId === 'projTab1') {
+            btns[0].classList.add('active');
+            document.getElementById('projTab1').classList.add('active');
+        } else {
+            btns[1].classList.add('active');
+            document.getElementById('projTab2').classList.add('active');
+        }
+        updateProjAll();
+    }
+
+    function applyProjPreset() {
+        const preset = document.getElementById('projLensPreset').value;
+        const tw = document.getElementById('projThrowWide');
+        const tt = document.getElementById('projThrowTele');
+
+        switch(preset) {
+            case 'standard': tw.value = 1.2; tt.value = 1.8; break;
+            case 'short': tw.value = 0.6; tt.value = 0.8; break;
+            case 'ultrashort': tw.value = 0.25; tt.value = 0.35; break;
+            case 'long': tw.value = 2.0; tt.value = 3.5; break;
+        }
+        syncProjSliderLimits();
+    }
+
+    function syncProjSliderLimits() {
+        const tw = parseFloat(document.getElementById('projThrowWide').value) || 0.1;
+        const tt = parseFloat(document.getElementById('projThrowTele').value) || 5.0;
+        const slider = document.getElementById('projSlider');
+
+        slider.min = tw;
+        slider.max = tt;
+        
+        if(parseFloat(slider.value) < tw) slider.value = tw;
+        if(parseFloat(slider.value) > tt) slider.value = tt;
+
+        document.getElementById('projLblWide').innerText = tw.toFixed(2);
+        document.getElementById('projLblTele').innerText = tt.toFixed(2);
+    }
+
+    function updateProjAll() {
+        const aspect = document.getElementById('projAspect').value;
+        const throwW = parseFloat(document.getElementById('projThrowWide').value);
+        const throwT = parseFloat(document.getElementById('projThrowTele').value);
+        const curThrow = parseFloat(document.getElementById('projSlider').value);
+
+        document.getElementById('projLblCurrent').innerText = curThrow.toFixed(2) + ' : 1';
+
+        if(!throwW || !throwT || throwW > throwT) return;
+
+        let rW = 16, rH = 9;
+        if(aspect === '16:10') { rW = 16; rH = 10; }
+        else if(aspect === '4:3') { rW = 4; rH = 3; }
+
+        const diagRatio = Math.sqrt(rW * rW + rH * rH);
+
+        if (activeProjTab === 'projTab1') {
+            const dist = parseFloat(document.getElementById('projInputDistance').value);
+            if (!dist || dist <= 0) return;
+
+            const widthW = dist / throwW;
+            const widthCur = dist / curThrow;
+            const widthT = dist / throwT;
+
+            const heightW = widthW * (rH / rW);
+            const inchW = (widthW * (diagRatio / rW)) / 0.0254;
+
+            const heightCur = widthCur * (rH / rW);
+            const inchCur = (widthCur * (diagRatio / rW)) / 0.0254;
+
+            const heightT = widthT * (rH / rW);
+            const inchT = (widthT * (diagRatio / rW)) / 0.0254;
+
+            document.getElementById('p1WDiag').innerText = inchW.toFixed(0) + ' "';
+            document.getElementById('p1WWidth').innerText = widthW.toFixed(2) + ' m';
+            document.getElementById('p1WHeight').innerText = heightW.toFixed(2) + ' m';
+
+            document.getElementById('p1CurDiag').innerText = inchCur.toFixed(0) + ' "';
+            document.getElementById('p1CurWidth').innerText = widthCur.toFixed(2) + ' m';
+            document.getElementById('p1CurHeight').innerText = heightCur.toFixed(2) + ' m';
+
+            document.getElementById('p1TDiag').innerText = inchT.toFixed(0) + ' "';
+            document.getElementById('p1TWidth').innerText = widthT.toFixed(2) + ' m';
+            document.getElementById('p1THeight').innerText = heightT.toFixed(2) + ' m';
+        } else {
+            const inch = parseFloat(document.getElementById('projInputInch').value);
+            if (!inch || inch <= 0) return;
+
+            const diagM = inch * 0.0254;
+            const targetW = diagM * (rW / diagRatio);
+
+            const distW = targetW * throwW;
+            const distCur = targetW * curThrow;
+            const distT = targetW * throwT;
+
+            document.getElementById('p2WDist').innerText = distW.toFixed(2) + ' m';
+            document.getElementById('p2CurDist').innerText = distCur.toFixed(2) + ' m';
+            document.getElementById('p2TDist').innerText = distT.toFixed(2) + ' m';
+        }
+    }
+
+    // Initialization
+    applySensorPreset();
+    syncCamSliderLimits();
+    syncProjSliderLimits();
+    updateCamAll();
+    updateProjAll();
+</script>
+
+</body>
+</html>
